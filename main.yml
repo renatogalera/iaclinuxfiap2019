@@ -1,16 +1,14 @@
-- name: Salvando host ao grupo
+- name: Iniciando aprovisionamento
   hosts: "{{ hostname }}"
-  connection: local
   gather_facts: no
   tasks:
-    - name: Adicionando...
-      add_host:
-        hostname: "{{ hostname }}"
-        groups:
-        - all
     - name: Install yum utils
       yum:
         name: yum-utils
+        state: latest
+    - name: Yum install git
+      yum:
+        name: git
         state: latest
     - name: Install device-mapper-persistent-data
       yum:
@@ -50,11 +48,21 @@
         state: started
         enabled: yes
       become: yes
-    - name: Install Docker Compose
-      package:
-        name: docker-compose
-        state: latest
-      become: yes
-    - name: Compose UP
-      command: docker-compose up -d
-      ignore_errors: True
+    - name: Check if Docker Compose is installed
+      command: docker-compose --version
+      register: docker_compose_check
+      ignore_errors: yes
+    - name: Download and install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.21.2/docker-compose-Linux-x86_64
+        dest: /usr/bin/docker-compose
+        mode: 0755
+      when:
+        - docker_compose_check.msg is defined
+        - docker_compose_check.msg.find('No such file or directory') != -1
+    - name: Download repository 
+      git:
+        repo: https://github.com/renatogalera/iaclinuxfiap2019.git
+        dest: /tmp
+    - name: Subindo com compose
+      command: docker-compose -f /tmp/iaclinuxfiap2019/docker-compose.yml up -d
