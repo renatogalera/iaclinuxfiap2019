@@ -4,12 +4,10 @@ services:
     container_name: mediawiki
     image: mediawiki
     restart: always
-    ports:
-      - 8080:80
     links:
       - mariadbmediawiki
     volumes:
-      - ./data/mediawiki:/var/www/html/images
+      - ./data/mediawiki:/var/www/html
       # After initial setup, download LocalSettings.php to the same directory as
       # this yaml and uncomment the following line and use compose to restart
       # the mediawiki service
@@ -46,8 +44,6 @@ services:
     image: grafana/grafana:6.4.3
     restart: always
     container_name: grafana
-    ports:
-      - "3000:3000"
     volumes:
       - ./config/grafana.ini:/etc/grafana/grafana.ini
       - ./data/grafana:/var/lib/grafana
@@ -66,8 +62,6 @@ services:
     command:
       - '--config.file=/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/data'
-    ports:
-      - 9090:9090
     links:
       - mariadbgrafana
       - mariadbmediawiki
@@ -88,23 +82,17 @@ services:
     command:
       - '--config.file=/prometheus/alertmanager.yml'
       - '--storage.path=/data'
-    ports:
-      - 9093:9093
     networks:
       - allnet
   node:
     image: prom/node-exporter:v0.18.1
     container_name: nodeexporter
-    ports:
-      - 9100:9100
     restart: always
     networks:
       - allnet
   cadvisor:
     image: google/cadvisor:v0.33.0
     container_name: cadvisor
-    ports:
-      - 9880:8080
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -115,16 +103,12 @@ services:
   collectd:
     image: prom/collectd-exporter:master
     container_name: collectd
-    ports:
-      - 9103:9103
     restart: always
     networks:
       - allnet
   alerta:
     image: alerta/alerta-web
     container_name: alerta
-    ports:
-      - 9080:8080
     depends_on:
       - mongodb
     environment:
@@ -147,23 +131,19 @@ services:
   mysqlexporterwiki:
     image: prom/mysqld-exporter
     container_name: mysqlexporterwiki
-    ports:
-      - 9104:9104
     depends_on:
       - mariadbmediawiki
     environment:
-      DATA_SOURCE_NAME: "root:${PASSMYSQLROOT}@(mariadbmediawiki:3306)/"
+      DATA_SOURCE_NAME: "root:CHANGEME@(mariadbmediawiki:3306)/"
     networks:
       - allnet
   mysqlexportergrafana:
     image: prom/mysqld-exporter
     container_name: mysqlexportergrafana
-    ports:
-      - 9105:9104
     depends_on:
       - mariadbgrafana
     environment:
-      DATA_SOURCE_NAME: "root:${PASSMYSQLROOT}@(mariadbgrafana:3306)/"
+      DATA_SOURCE_NAME: "root:CHANGEME@(mariadbgrafana:3306)/"
     networks:
       - allnet
   haproxy:
