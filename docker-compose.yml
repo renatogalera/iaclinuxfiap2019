@@ -9,7 +9,11 @@ services:
     links:
       - mariadbmediawiki
     volumes:
-      - ./data/mediawiki:/var/www/html
+      - ./data/mediawiki:/var/www/html/images
+      # After initial setup, download LocalSettings.php to the same directory as
+      # this yaml and uncomment the following line and use compose to restart
+      # the mediawiki service
+      # - ./LocalSettings.php:/var/www/html/LocalSettings.php
     networks:
       - allnet
   mariadbmediawiki:
@@ -21,8 +25,21 @@ services:
     environment:
       MYSQL_DATABASE: mediawiki
       MYSQL_USER: mediawiki
-      MYSQL_PASSWORD: "${PASSMYSQLMEDIAWIKI}"
-      MYSQL_ROOT_PASSWORD: "${PASSMYSQLROOT}"
+      MYSQL_PASSWORD: "CHANGEME"
+      MYSQL_ROOT_PASSWORD: "CHANGEME"
+    networks:
+      - allnet
+  mariadbgrafana:
+    container_name: mariadbgrafana
+    image: mariadb:10.4.8
+    restart: always
+    volumes:
+      - ./data/mariadbgrafana:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: grafana
+      MYSQL_USER: grafana
+      MYSQL_PASSWORD: "CHANGEME"
+      MYSQL_ROOT_PASSWORD: "CHANGEME"
     networks:
       - allnet
   grafana:
@@ -36,6 +53,8 @@ services:
       - ./data/grafana:/var/lib/grafana
       - ./config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
       - ./config/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yml
+    depends_on:
+      - mariadbgrafana
     networks:
       - allnet
   prometheus:
@@ -50,6 +69,7 @@ services:
     ports:
       - 9090:9090
     links:
+      - mariadbgrafana
       - mariadbmediawiki
       - grafana
       - mongodb
