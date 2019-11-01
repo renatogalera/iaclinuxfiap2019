@@ -7,11 +7,7 @@ services:
     links:
       - mariadbmediawiki
     volumes:
-      - ./data/mediawiki:/var/www/html
-      # After initial setup, download LocalSettings.php to the same directory as
-      # this yaml and uncomment the following line and use compose to restart
-      # the mediawiki service
-      # - ./LocalSettings.php:/var/www/html/LocalSettings.php
+      - ./data/mediawiki:/var/www/html:rw
     networks:
       - allnet
   mariadbmediawiki:
@@ -32,7 +28,7 @@ services:
     image: mariadb:10.4.8
     restart: always
     volumes:
-      - ./data/mariadbgrafana:/var/lib/mysql
+      - ./data/mariadbgrafana:/var/lib/mysql:rw
     environment:
       MYSQL_DATABASE: grafana
       MYSQL_USER: grafana
@@ -46,7 +42,7 @@ services:
     container_name: grafana
     volumes:
       - ./config/grafana.ini:/etc/grafana/grafana.ini
-      - ./data/grafana:/var/lib/grafana
+      - ./data/grafana:/var/lib/grafana:rw
       - ./config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
       - ./config/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yml
     depends_on:
@@ -57,8 +53,8 @@ services:
     image: prom/prometheus:v2.13.1
     container_name: prometheus
     volumes:
-      - ./config:/prometheus
-      - ./data/prometheus:/data
+      - ./config:/prometheus:rw
+      - ./data/prometheus:/data:rw
     command:
       - '--config.file=/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/data'
@@ -77,8 +73,8 @@ services:
     image: prom/alertmanager:v0.19.0
     container_name: alertmanager
     volumes:
-      - ./config:/prometheus
-      - ./data/alertmanager:/data
+      - ./config:/prometheus:rw
+      - ./data/alertmanager:/data:rw
     command:
       - '--config.file=/prometheus/alertmanager.yml'
       - '--storage.path=/data'
@@ -124,7 +120,7 @@ services:
     image: mongo:4.2.1
     container_name: mongodb
     volumes:
-      - ./data/mongodb:/data/db
+      - ./data/mongodb:/data/db:rw
     restart: always
     networks:
       - allnet
@@ -137,7 +133,7 @@ services:
       DATA_SOURCE_NAME: "root:CHANGEME@(mariadbmediawiki:3306)/"
     networks:
       - allnet
-  mysqlexportergrafana:
+  mysqlexportergrafana: 
     image: prom/mysqld-exporter
     container_name: mysqlexportergrafana
     depends_on:
@@ -149,6 +145,7 @@ services:
   haproxy:
     image: haproxytech/haproxy-alpine:2.1
     container_name: haproxy
+    restart: always
     ports:
       - 80:80
       - 9000:9000
@@ -159,8 +156,15 @@ services:
       - cadvisor
       - alerta
       - alertmanager
+    depends_on:
+      - grafana
+      - mediawiki
+      - prometheus
+      - cadvisor
+      - alerta
+      - alertmanager
     volumes:
-      - ./data/haproxy:/usr/local/etc/haproxy
+      - ./data/haproxy:/usr/local/etc/haproxy:rw
     networks:
       - allnet
 networks:

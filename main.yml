@@ -1,7 +1,11 @@
 - name: Iniciando aprovisionamento
   hosts: "{{ hostname }}"
-  gather_facts: no
   tasks:
+    - name: Add Docker User
+      user:
+        name: docker
+        comment: Docker user
+        uid: 1040
     - name: Install yum utils
       yum:
         name: yum-utils
@@ -61,6 +65,6 @@
     - name: Download repository 
       git:
         repo: https://github.com/renatogalera/iaclinuxfiap2019.git
-        dest: /tmp
+        dest: /tmp/mediawiki
     - name: Setup docker-compose.yml
-      command: docker-compose -f /tmp/iaclinuxfiap2019/docker-compose.yml up -d
+      command: docker-compose -f /tmp/mediawiki/docker-compose.yml up -d
