@@ -65,6 +65,6 @@
     - name: Download repository 
       git:
         repo: https://github.com/renatogalera/iaclinuxfiap2019.git
-        dest: /tmp/mediawiki
+        dest: /tmp/ansible
     - name: Setup docker-compose.yml
-      command: docker-compose -f /tmp/mediawiki/docker-compose.yml up -d
+      command: docker-compose -f /tmp/ansible/docker-compose.yml up -d
