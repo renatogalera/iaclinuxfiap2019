@@ -66,5 +66,15 @@
       git:
         repo: https://github.com/renatogalera/iaclinuxfiap2019.git
         dest: /home/docker-mediawiki
+    - name: Chown user grafana
+      file:
+        path: /home/docker-mediawiki/data/grafana
+        owner: 472
+        group: 472
+    - name: Create an insecure file
+      file:
+        path: /home/docker-mediawiki/data/prometheus
+        owner: 996
+        group: 996
     - name: Setup docker-compose.yml
       command: docker-compose -f /home/docker-mediawiki/docker-compose.yml up -d
