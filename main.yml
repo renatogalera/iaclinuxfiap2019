@@ -71,10 +71,10 @@
         path: /home/docker-mediawiki/data/grafana
         owner: 472
         group: 472
-    - name: Create an insecure file
+    - name: Chown user prometheus
       file:
         path: /home/docker-mediawiki/data/prometheus
-        owner: 996
-        group: 996
+        owner: 1000
+        group: 1000
     - name: Setup docker-compose.yml
       command: docker-compose -f /home/docker-mediawiki/docker-compose.yml up -d

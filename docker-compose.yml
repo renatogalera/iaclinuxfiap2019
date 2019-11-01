@@ -52,6 +52,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.13.1
     container_name: prometheus
+    user: "1000:1000"
     volumes:
       - ./config:/prometheus
       - ./data/prometheus:/data
