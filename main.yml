@@ -62,5 +62,5 @@
       git:
         repo: https://github.com/renatogalera/iaclinuxfiap2019.git
         dest: /tmp
-    - name: Subindo com compose
+    - name: Setup docker-compose.yml
       command: docker-compose -f /tmp/iaclinuxfiap2019/docker-compose.yml up -d
