@@ -36,8 +36,6 @@ services:
       - ./data/grafana:/var/lib/grafana
       - ./config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
       - ./config/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yml
-    depends_on:
-      - mariadbgrafana
     networks:
       - allnet
   prometheus:
