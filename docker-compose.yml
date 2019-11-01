@@ -25,19 +25,6 @@ services:
       MYSQL_ROOT_PASSWORD: "${PASSMYSQLROOT}"
     networks:
       - allnet
-  mariadbgrafana:
-    container_name: mariadbgrafana
-    image: mariadb:10.4.8
-    restart: always
-    volumes:
-      - ./data/mariadbgrafana:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: grafana
-      MYSQL_USER: grafana
-      MYSQL_PASSWORD: "${PASSMYSQLGRAFANA}"
-      MYSQL_ROOT_PASSWORD: "${PASSMYSQLROOT}"
-    networks:
-      - allnet
   grafana:
     image: grafana/grafana:6.4.3
     restart: always
@@ -65,7 +52,6 @@ services:
     ports:
       - 9090:9090
     links:
-      - mariadbgrafana
       - mariadbmediawiki
       - grafana
       - mongodb
