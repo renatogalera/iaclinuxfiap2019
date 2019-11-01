@@ -7,7 +7,7 @@ services:
     links:
       - mariadbmediawiki
     volumes:
-      - ./data/mediawiki:/var/www/html:rw
+      - ./data/mediawiki:/var/www/html
     networks:
       - allnet
   mariadbmediawiki:
@@ -28,7 +28,7 @@ services:
     image: mariadb:10.4.8
     restart: always
     volumes:
-      - ./data/mariadbgrafana:/var/lib/mysql:rw
+      - ./data/mariadbgrafana:/var/lib/mysql
     environment:
       MYSQL_DATABASE: grafana
       MYSQL_USER: grafana
@@ -42,7 +42,7 @@ services:
     container_name: grafana
     volumes:
       - ./config/grafana.ini:/etc/grafana/grafana.ini
-      - ./data/grafana:/var/lib/grafana:rw
+      - ./data/grafana:/var/lib/grafana
       - ./config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
       - ./config/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yml
     depends_on:
@@ -53,8 +53,8 @@ services:
     image: prom/prometheus:v2.13.1
     container_name: prometheus
     volumes:
-      - ./config:/prometheus:rw
-      - ./data/prometheus:/data:rw
+      - ./config:/prometheus
+      - ./data/prometheus:/data
     command:
       - '--config.file=/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/data'
@@ -73,8 +73,8 @@ services:
     image: prom/alertmanager:v0.19.0
     container_name: alertmanager
     volumes:
-      - ./config:/prometheus:rw
-      - ./data/alertmanager:/data:rw
+      - ./config:/prometheus
+      - ./data/alertmanager:/data
     command:
       - '--config.file=/prometheus/alertmanager.yml'
       - '--storage.path=/data'
@@ -91,7 +91,7 @@ services:
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run:/var/run
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     networks:
@@ -120,7 +120,7 @@ services:
     image: mongo:4.2.1
     container_name: mongodb
     volumes:
-      - ./data/mongodb:/data/db:rw
+      - ./data/mongodb:/./data/db
     restart: always
     networks:
       - allnet
@@ -164,7 +164,7 @@ services:
       - alerta
       - alertmanager
     volumes:
-      - ./data/haproxy:/usr/local/etc/haproxy:rw
+      - ./data/haproxy:/usr/local/etc/haproxy
     networks:
       - allnet
 networks:
